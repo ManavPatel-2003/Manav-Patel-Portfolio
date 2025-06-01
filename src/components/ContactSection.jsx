@@ -9,6 +9,7 @@ import {
   Twitter,
   Github
 } from "lucide-react";
+import conf from "../../conf";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -16,19 +17,39 @@ import { useState } from "react";
 export const ContactSection = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
+      
+  const [result, setResult] = useState("");
+      
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setResult("Sending....");
     setIsSubmitting(true);
-
-    setTimeout(() => {
-      toast({
-        title: "Message sent!",
-        description: "Thank you for your message.",
-      });
-      setIsSubmitting(false);
-    }, 1500);
+    const formData = new FormData(event.target);
+    
+    formData.append("access_key", conf.access_key);
+    
+    const response = await fetch(conf.api_url, {
+      method: "POST",
+      body: formData
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      setResult("Form Submitted Successfully");
+      // setIsSubmitting(false);
+        setTimeout(() => {
+        toast({
+            title: "Message sent!",
+            description: "Thank you for your message.",
+          });
+          setIsSubmitting(false);
+        }, 1500);
+      event.target.reset();
+    } else {
+      // console.log("Error", data);
+      setResult(data.message);
+    }
   };
   return (
     <section id="contact" className="py-24 px-4 relative bg-secondary/30">
@@ -115,11 +136,11 @@ export const ContactSection = () => {
 
           <div
             className="bg-card p-8 rounded-lg shadow-xs"
-            onSubmit={handleSubmit}
+            
           >
             <h3 className="text-2xl font-semibold mb-6"> Send a Message</h3>
 
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label
                   htmlFor="name"
@@ -175,12 +196,13 @@ export const ContactSection = () => {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                
                 className={cn(
                   "cosmic-button w-full flex items-center justify-center gap-2"
                 )}
               >
                 {isSubmitting ? "Sending..." : "Send Message"}
+                {/* Send Message */}
                 <Send size={16} />
               </button>
             </form>
