@@ -39,13 +39,11 @@ export const AboutSection = () => {
                 target="_blank"
                 download
               >
-                <div className="flex justify-between gap-2">
-                <div>
-                Resume
-                </div>
-                <div>
+                <div className="flex justify-center items-center gap-2">
+                <span>
+                  Resume
+                </span>
                 <ExternalLink size={20} />
-                </div>
                 </div>
                 
               </a>
